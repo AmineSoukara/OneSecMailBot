@@ -2,7 +2,8 @@ import logging
 from aiogram import Bot, Dispatcher, executor, types
 from config import API_TOKEN
 import keyboard as kb
-from onesec_api import Mailbox
+from dropmail import Dropmail, EMail
+
 import json
 import asyncio
 
@@ -16,19 +17,20 @@ async def texthandler(m: types.Message):
     if m.text != 'استلام البريد':
         await m.answer(f'مرحبا, {m.from_user.mention}\nتم تصميم هذا الروبوت لتلقي رسائل  البريد المؤقت بسرعة. انقر فوق الزر أدناه', reply_markup=kb.menu)
     elif m.text == 'استلام البريد':
-        ma = Mailbox('')
-        email = f'{ma._mailbox_}@1secmail.com'
-        await m.answer(f'➕ ها هو بريدك الإلكتروني: {email}\nارسل رسالة.\nيتم فحص البريد تلقائيًا ، كل 4 ثوانٍ ، إذا وصلت رسالة جديدة ، فسوف نخطرك!\nملاحظة: يمكنك تلقي فقط رسالة واحدة - لكل بريد إلكتروني  ')
+        mail = Dropmail("randomtoken")
+        mail.NewSession()
+
+        email = mail.Address
+        await m.answer(f'➕ ها هو بريدك الإلكتروني: {email}\nارسل رسالة. فحص البريد تلقائيًا ، كل 4 ثوانٍ ، إذا وصلت رسالة جديدة ، فسوف نخطرك')
         while True:
-            mb = ma.filtred_mail()
-            if isinstance(mb, list):
-                mf = ma.mailjobs('read',mb[0])
-                js = mf.json()
-                fromm = js['from']
-                theme = js['subject']
-                mes = js['textBody']
-                await m.answer(f'💬 رسالة جديدة:\n<b>من عند</b>: {fromm}\n<b>موضوع</b>: {theme}\n<b>رسالة</b>: {mes}', reply_markup=kb.menu, parse_mode='HTML')
-                break
+            mails = mail.GetEmails()
+            if isinstance(mails, list):
+                for m in mails:
+
+                    await m.answer(f"Subject: {m.Subject}, Text: {m.Text}")
+                    break
+                    # await m.answer(f'💬 رسالة جديدة:\n<b>من عند</b>: {fromm}\n<b>موضوع</b>: {theme}\n<b>رسالة</b>: {mes}', reply_markup=kb.menu, parse_mode='HTML')
+ 
             else:
                 pass
             await asyncio.sleep(4)
