@@ -27,8 +27,8 @@ async def texthandler(m: types.Message):
             if isinstance(mails, list):
                 for x in mails:
 
-                    await m.answer(f"From: {x.From}, To: {x.To}\n\nSubject: {x.Subject}, Text: {x.Text}")
-                    break
+                    return await m.answer(f"From: {x.From}\nTo: {x.To}\n\nSubject: {x.Subject}\nText: {x.Text}")
+                    # break
                     # await m.answer(f'💬 رسالة جديدة:\n<b>من عند</b>: {fromm}\n<b>موضوع</b>: {theme}\n<b>رسالة</b>: {mes}', reply_markup=kb.menu, parse_mode='HTML')
  
             else:
